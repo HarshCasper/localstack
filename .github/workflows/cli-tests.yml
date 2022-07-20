@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - ".github/workflows/pro-integration.yml"
       - "localstack/**"
       - "tests/**"
       - "setup.py"
@@ -13,11 +12,13 @@ on:
       - "Dockerfile.rh"
       - "docker-compose.yml"
       - "bin/**"
+      - ".github/"
     branches:
       - master
+      - windows-check
   push:
     paths:
-      - ".github/workflows/pro-integration.yml"
+      - ".github/"
       - "localstack/**"
       - "tests/**"
       - "setup.py"
@@ -29,6 +30,7 @@ on:
       - "bin/**"
     branches:
       - master
+      - windows-check
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -36,11 +38,12 @@ concurrency:
 
 jobs:
   cli-tests:
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: [ "3.7", "3.8", "3.9", "3.10" ]
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
       - name: Checkout
